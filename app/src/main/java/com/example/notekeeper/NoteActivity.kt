@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
-class MainActivity : AppCompatActivity() {
+class NoteActivity : AppCompatActivity() {
     private var notePosition = POSITION_NOT_SET
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,10 +25,23 @@ class MainActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCourses.adapter = adapter
 
-        notePosition = intent.getIntExtra(EXTRA_STRING_POSITION, POSITION_NOT_SET)
+        notePosition =
+            savedInstanceState?.getInt(NOTE_POSITION, POSITION_NOT_SET) ?: intent.getIntExtra(
+                NOTE_POSITION,
+                POSITION_NOT_SET
+            )
+
         if (notePosition != POSITION_NOT_SET) {
             displayNote()
+        } else {
+            DataManager.notes.add(NoteInfo())
+            notePosition = DataManager.notes.lastIndex
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(NOTE_POSITION, POSITION_NOT_SET)
     }
 
     private fun displayNote() {
@@ -65,14 +78,26 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        if (notePosition >= DataManager.notes.lastIndex){
+        if (notePosition >= DataManager.notes.lastIndex) {
             val menuItem = menu?.findItem(R.id.action_next)
-            if (menuItem != null ){
+            if (menuItem != null) {
                 menuItem.icon = getDrawable(R.drawable.ic_block_white_24dp)
                 menuItem.isEnabled = false
             }
         }
 
         return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveNote()
+    }
+
+    private fun saveNote() {
+        val note = DataManager.notes[notePosition]
+        note.title = textNoteTitle.text.toString()
+        note.text = textNoteText.text.toString()
+        note.course = spinnerCourses.selectedItem as CourseInfo
     }
 }
