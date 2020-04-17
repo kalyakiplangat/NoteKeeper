@@ -25,7 +25,7 @@ import com.jwhh.notekeeper.CourseRecyclerAdapter
 import kotlinx.android.synthetic.main.activity_items.*
 import kotlinx.android.synthetic.main.content_items.*
 
-class ItemsActivity : AppCompatActivity() {
+class ItemsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -61,12 +61,19 @@ class ItemsActivity : AppCompatActivity() {
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
+        nav_view.setNavigationItemSelectedListener(this)
+
         displayNote()
     }
 
     private fun displayNote() {
         listItem.layoutManager = linearLayoutManager
         listItem.adapter = noteRecyclerAdapter
+    }
+
+    private fun displayNCourse() {
+        listItem.layoutManager = courseLayoutManager
+        listItem.adapter = courseRecyclerAdapter
     }
 
     override fun onResume() {
@@ -87,25 +94,25 @@ class ItemsActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-//    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-//        item.isChecked = true
-//        drawer_layout.closeDrawers()
-//        when (item.itemId) {
-//            R.id.nav_notes -> {
-//                displayNote()
-//            }
-//            R.id.nav_courses -> {
-//
-//            }
-//            R.id.nav_share -> {
-//
-//            }
-//            R.id.nav_send -> {
-//
-//            }
-//
-//        }
-//        return true
-//    }
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        item.isChecked = true
+        drawer_layout.closeDrawers()
+        when (item.itemId) {
+            R.id.nav_notes -> {
+                displayNote()
+            }
+            R.id.nav_courses -> {
+                displayNCourse()
+            }
+            R.id.nav_share -> {
+
+            }
+            R.id.nav_send -> {
+
+            }
+
+        }
+        return true
+    }
 
 }
